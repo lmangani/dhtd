@@ -103,8 +103,15 @@ extern const char *inet_ntop(int, const void *, char *, socklen_t);
 
 #endif
 
+/* AF_INET6 Workaround for Cosmopolitan */
+#ifndef AF_INET6_CONST
+    #define AF_INET6_CONST 10  // Standard value for IPv6
+#else
+    #define AF_INET6_CONST AF_INET6  // Use the system's AF_INET6 directly
+#endif
+
 /* We set sin_family to 0 to mark unused slots. */
-#if AF_INET == 0 || AF_INET6 == 0
+#if AF_INET == 0 || AF_INET6_CONST == 0
 #error You lose
 #endif
 
@@ -390,7 +397,7 @@ is_martian(const struct sockaddr *sa)
             (address[0] == 127) ||
             ((address[0] & 0xE0) == 0xE0);
     }
-    case AF_INET6: {
+    case AF_INET6_CONST: {
         struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)sa;
         const unsigned char *address = (const unsigned char*)&sin6->sin6_addr;
         return sin6->sin6_port == 0 ||
@@ -2263,7 +2270,7 @@ dht_periodic(const void *buf, size_t buflen,
                 case AF_INET:
                     m.port = htons(((struct sockaddr_in*)from)->sin_port);
                     break;
-                case AF_INET6:
+                case AF_INET6_CONST:
                     m.port = htons(((struct sockaddr_in6*)from)->sin6_port);
                     break;
                 }

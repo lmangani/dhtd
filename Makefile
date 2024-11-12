@@ -1,7 +1,13 @@
+CC ?= gcc 
+ifneq (,$(findstring cosmocc,$(CC)))
+    CFLAGS += -mclang -static -Wall -Wwrite-strings
+else
+    CFLAGS += -Wall -Wwrite-strings -pedantic -std=gnu99
+endif
 
-CFLAGS += -Wall -Wwrite-strings -pedantic -std=gnu99
 LDFLAGS += -lc
-FEATURES ?= cli lpd debug
+# FEATURES ?= cli lpd debug
+FEATURES ?= cli
 
 OBJS = build/kad.o build/log.o build/results.o \
 	build/conf.o build/net.o build/utils.o \
