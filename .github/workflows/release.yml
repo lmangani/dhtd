@@ -1,4 +1,4 @@
-name: Cosmo Releaser
+name: Static + Cosmo Releaser
 
 on:
   workflow_dispatch:
@@ -7,9 +7,32 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: bjia56/setup-cosmocc@main
+      with:
+        version: "latest"
+    - name: gcc
+      run: make
+      env:
+          CFLAGS: -static
+    - name: Upload release
+      if: github.event_name != 'pull_request'
+      uses: boxpositron/upload-multiple-releases@1.0.7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_config: |
+            build/dhtd
+        tag_name: ${{ github.ref_name }}
+        release_name: ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        overwrite: true   
 
+  build-cosmo:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: bjia56/setup-cosmocc@main
@@ -22,6 +45,7 @@ jobs:
           CXX: cosmoc++
           PLATFORM: cosmo
       run: make
+    - run: cp build/dhtd build/dhtd-cosmo
     - name: Upload release
       if: github.event_name != 'pull_request'
       uses: boxpositron/upload-multiple-releases@1.0.7
@@ -29,7 +53,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         release_config: |
-            build/dhtd
+            build/dhtd-cosmo
         tag_name: ${{ github.ref_name }}
         release_name: ${{ github.ref_name }}
         draft: false
