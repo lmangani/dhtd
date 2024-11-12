@@ -103,9 +103,16 @@ extern const char *inet_ntop(int, const void *, char *, socklen_t);
 
 #endif
 
+/* AF_INET6 Workaround for Cosmopolitan */
+#ifndef AF_INET6_CONST
+    #define AF_INET6_CONST 10  // Standard value for IPv6
+#else
+    #define AF_INET6_CONST AF_INET6  // Use the system's AF_INET6 directly
+#endif
+
 /* We set sin_family to 0 to mark unused slots. */
-#if AF_INET == 0 || AF_INET6 == 0
-/* #error You lose */
+#if AF_INET == 0 || AF_INET6_CONST == 0
+#error You lose
 #endif
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
@@ -377,12 +384,6 @@ print_hex(FILE *f, const unsigned char *buf, int buflen)
     for(i = 0; i < buflen; i++)
         fprintf(f, "%02x", buf[i]);
 }
-
-#ifndef AF_INET6_CONST
-    #define AF_INET6_CONST 10  // Standard value for IPv6
-#else
-    #define AF_INET6_CONST AF_INET6  // Use the system's AF_INET6 directly
-#endif
 
 static int
 is_martian(const struct sockaddr *sa)
