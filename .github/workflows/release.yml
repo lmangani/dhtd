@@ -85,6 +85,7 @@ jobs:
         overwrite: true   
 
   docker:
+    needs: build-static
     runs-on: ubuntu-latest
     permissions:
       contents: read
