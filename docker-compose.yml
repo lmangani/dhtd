@@ -1,0 +1,9 @@
+services:
+  dhtd:
+    image: 'ghcr.io/lmangani/dhtd:main'
+    restart: always
+    ports:
+      - '6881:6881'
+    volumes:
+      - /tmp:/tmp
+    command: '/dhtd --peer router.bittorrent.com:6881 --peer bttracker.debian.org:6881'
